@@ -1,15 +1,20 @@
 #!/bin/sh
-# ════════════════════════════════════════════════════════════════
+# ═════════引用网络接口═════════
 # Name:          John Doe
 # Website:       www.saoml.cfd
-# Creation Date: March 8, 2025
-# Last Modified: March 8, 2025
 # Version:       8.0
-# ════════════════════════════════════════════════════════════════
+# URL：          api.covibe.cn
+# ═════════引用网络接口═════════
 
 cd /root
 rm -rf $0
 ulimit -c 0
+
+API_KEY="74f8f998-3387-8130-74e5-e4c27de32e8c7d0b279b" # IP获取接口KEY
+
+get_local_ip() {
+    curl -s "https://api.covibe.cn/api/getip/api.php?apikey=$API_KEY" # IP获取接口
+}
 
 DNS_CMD="dig +short"  
 # DNS_CMD="host -t a"  # 备选方案
@@ -19,16 +24,17 @@ get_random_ip() {
     local default_ip="$2"
     local ips
 
-    ips=($(eval "$DNS_CMD $domain 2>/dev/null" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'))
+    ips=($($DNS_CMD "$domain" 2>/dev/null | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'))
 
     [ ${#ips[@]} -eq 0 ] && echo "$default_ip" || echo "${ips[RANDOM % ${#ips[@]}]}"
 }
 
 auth_ip=$(get_random_ip "ip.saoml.cfd" "154.40.37.205")
-random_ip=$(get_random_ip "oss.saoml.cfd" "116.204.134.202")
+random_ip=$(get_random_ip "node.saoml.cfd" "103.121.94.132")
 
 sed -i '/saoml/d' /etc/hosts
 printf "\n%s oss.saoml.com\n" "$random_ip" >> /etc/hosts
+
 
 
 function centos_ver(){
@@ -312,7 +318,7 @@ if [[ $install == 5 ]];then
 	echo
 	read -p "请设置APP解析地址(可输入域名或IP，不带http://，回车默认本机IP): " app_ip
 	if [ -z "$app_ip" ];then
-	app_ip=`curl -s http://members.3322.org/dyndns/getip`;
+	app_ip=$(get_local_ip)
 	fi
 	echo -e "已设置APP解析地址为:\033[32m "$app_ip"\033[0m"
 	
@@ -373,7 +379,7 @@ if [[ $install == 6 ]];then
 	echo
 	read -p "请设置APP解析地址(可输入域名或IP，不带http://，回车默认本机IP): " app_ip
 	if [ -z "$app_ip" ];then
-	app_ip=`curl -s http://members.3322.org/dyndns/getip`;
+	app_ip=$(get_local_ip)
 	fi
 	echo -e "已设置APP解析地址为:\033[32m "$app_ip"\033[0m"
 	
@@ -450,8 +456,8 @@ fi
 
 echo "请稍等..."
 echo
-GIP=`curl -s http://members.3322.org/dyndns/getip`;
-echo -e "系统检测到的IP为：\033[37m"$GIP"\033[0m"
+fz_ip=$(get_local_ip)
+echo -e "系统检测到的IP为：\033[37m"$fz_ip"\033[0m"
 echo
 echo -e "如不正确请立即停止安装选择手动输入IP搭建，否则回车继续。"
 read
@@ -619,6 +625,6 @@ fi
  
 fi
 echo
-echo -e "\033[31m你是傻逼吗？选都不会选？\033[0m "
+echo -e "\033[31m选择错误，已退出！\033[0m "
 echo
 exit 0;
