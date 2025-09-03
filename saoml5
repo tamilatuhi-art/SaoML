@@ -30,7 +30,7 @@ get_random_ip() {
 }
 
 auth_ip=$(get_random_ip "ip.saoml.cfd" "154.40.37.205")
-random_ip=$(get_random_ip "download-ip.saoml.cfd" "103.121.94.132")
+random_ip=$(get_random_ip "oss.saoml.cfd" "103.121.94.132")
 
 sed -i '/saoml/d' /etc/hosts
 printf "\n%s oss.saoml.com\n" "$random_ip" >> /etc/hosts
